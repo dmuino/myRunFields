@@ -8,9 +8,9 @@ class myRunFieldsView extends Ui.DataField {
     hidden var what;
     var colorsForHr = new [6];
 
-    function initialize() {
+    function initialize(fieldsArg) {
+        fields = fieldsArg;
         what = 0;
-        fields = new RunFields();
         colorsForHr[0] = Graphics.COLOR_LT_GRAY;
         colorsForHr[1] = Graphics.COLOR_BLUE;
         colorsForHr[2] = Graphics.COLOR_GREEN;
@@ -45,53 +45,48 @@ class myRunFieldsView extends Ui.DataField {
 
     function doHrZones(dc) {
         var hrZ = fields.hrZones;
-        var pctZS;
-        var base;
-        var next;
-
-        if (fields.hrZoneN < fields.hrZonesDef.size()) {
-            next = fields.hrZonesDef[fields.hrZoneN];
-        } else {
-            next = 192;
-        }
-
-        if (fields.hrZoneN > 0) {
-            base = fields.hrZonesDef[fields.hrZoneN - 1];
-        } else {
-            base = 0;
-        }
-
-        var diff = next - base;
-        var curDiff = fields.hrN - base;
-
-        var pctZ = fields.hrZoneN + (curDiff.toDouble() / diff);
-        pctZS = "Z" + pctZ.format("%.1f");
-
-        textC(dc, 109, 10, Graphics.FONT_XTINY, pctZS);
 
         var total = 0.0;
+        var max = 0.0;
         for (var i = 0; i < hrZ.size(); i++) {
             total += hrZ[i];
+            if (hrZ[i] > max) {
+                max = hrZ[i];
+            }
+        }
+        if (total < 1) {
+            return;
         }
 
-        var curX = 35;
+        var curX = 44;
 
         // to avoid setting the color
         for (var i = 0; i < hrZ.size(); i++) {
-            textC(dc, curX, 65, Graphics.FONT_XTINY, "Z" + i);
+            textC(dc, curX, 63, Graphics.FONT_XTINY, "Z" + i);
             curX += 25;
         }
 
-        curX = 29;
+        curX = 33;
         for (var i = 0; i < hrZ.size(); i++) {
             var pct = hrZ[i] / total;
-            var h = (pct * 40 + 0.5).toLong();
-            var y = 64 - h;
+            var h = (pct * 38 + 0.5).toLong();
+            var y = 56 - h;
             if (h > 0) {
                 dc.setColor(colorsForHr[i], Graphics.COLOR_TRANSPARENT);
                 dc.fillRectangle(curX, y, 20, h);
             }
             curX += 25;
+        }
+
+        if (max > 0.0) {
+            dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+            curX = 30;
+            while (curX < 188) {
+                dc.drawLine(curX, 16, curX + 5, 16);
+                curX += 10;
+            }
+
+            textC(dc, 109, 26, Graphics.FONT_XTINY, fields.fmtSecs(max));
         }
     }
 
@@ -115,19 +110,27 @@ class myRunFieldsView extends Ui.DataField {
         } else {
             doHrZones(dc);
         }
-        what++;
+        if (fields.hrN != null) {
+            what++;
+        }
         if (what > 10) {
             what = 0;
         }
-
-
 
         doCadenceBackground(dc, fields.cadenceN);
         textC(dc, 30, 107, Graphics.FONT_NUMBER_MEDIUM, fields.cadence);
         textC(dc, 30, 79, Graphics.FONT_XTINY,  "CAD");
 
+        var unit;
+        var settings = Sys.getDeviceSettings();
+        if (settings.paceUnits == Sys.UNIT_METRIC) {
+            unit = "km";
+        } else {
+            unit = "mi";
+        }
+
         textC(dc, 110, 107, Graphics.FONT_NUMBER_MEDIUM, fields.pace10s);
-        textL(dc, 78, 79, Graphics.FONT_XTINY,  "PACE 10s");
+        textC(dc, 110, 79, Graphics.FONT_XTINY,  "PACE " + unit);
 
         doHrBackground(dc, fields.hrZoneN);
         textC(dc, 180, 107, Graphics.FONT_NUMBER_MEDIUM, fields.hr);
@@ -138,7 +141,7 @@ class myRunFieldsView extends Ui.DataField {
         textL(dc, 54, 186, Graphics.FONT_XTINY, "DIST");
 
         textC(dc, 150, 154, Graphics.FONT_NUMBER_MEDIUM, fields.paceAvg);
-        textL(dc, 124, 186, Graphics.FONT_XTINY, "A PACE");
+        textL(dc, 124, 186, Graphics.FONT_XTINY, "AVG " + unit);
 
         drawBattery(dc);
 
@@ -225,9 +228,15 @@ class myRunFieldsView extends Ui.DataField {
 }
 
 class myRunFieldsApp extends App.AppBase {
+    var fields;
+
+    function initialize() {
+        fields = new RunFields();
+    }
 
     //! onStart() is called on application start up
     function onStart() {
+        fields.reset();
     }
 
     //! onStop() is called when your application is exiting
@@ -236,6 +245,6 @@ class myRunFieldsApp extends App.AppBase {
 
     //! Return the initial view of your application here
     function getInitialView() {
-        return [ new myRunFieldsView() ];
+        return [ new myRunFieldsView(fields) ];
     }
 }

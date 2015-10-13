@@ -40,6 +40,10 @@ class RunFields {
         curPos = 0;
     }
 
+    function reset() {
+      initialize();
+    }
+
     function getAverage(a) {
         var count = 0;
         var sum = 0.0;
@@ -149,10 +153,11 @@ class RunFields {
         if (inActivity && hrN != null) {
             var timeSinceLastUpdate;
             if (lastElapsedTime == null) {
-                timeSinceLastUpdate = info.elapsedTime;
+                timeSinceLastUpdate = elapsed;
             } else {
-                timeSinceLastUpdate = info.elapsedTime - timeSinceLastUpdate;
+                timeSinceLastUpdate = elapsed - lastElapsedTime;
             }
+            lastElapsedTime = elapsed;
 
             hrZoneN = zoneFor(hrN);
             hrZones[hrZoneN] += (timeSinceLastUpdate / 1000.0);
