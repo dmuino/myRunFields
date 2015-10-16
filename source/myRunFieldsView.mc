@@ -6,6 +6,8 @@ using Toybox.System as Sys;
 class myRunFieldsView extends Ui.DataField {
     hidden var fields;
     hidden var what;
+    hidden var doingTimer = true;
+
     var colorsForHr = new [6];
 
     function initialize(fieldsArg) {
@@ -30,16 +32,22 @@ class myRunFieldsView extends Ui.DataField {
 
     function drawLayout(dc) {
         dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_WHITE);
-        // horizontal lines
-        dc.drawLine(0, 71, 218, 71);
         dc.drawLine(0, 132, 218, 132);
         dc.drawLine(0, 198, 218, 198);
         // vertical lines
-        if (what < 5 || fields.hrN == null) {
-            dc.drawLine(109, 0, 109, 71);
+        var y;
+        if (doingTimer) {
+            y = 71;
+        } else {
+            y = 86;
         }
-        dc.drawLine(65, 71, 65, 132);
-        dc.drawLine(153, 71, 153, 132);
+        dc.drawLine(0, y, 218, y);
+        if (doingTimer) {
+            dc.drawLine(109, 0, 109, y);
+        } else {
+        }
+        dc.drawLine(65, y, 65, 132);
+        dc.drawLine(153, y, 153, 132);
         dc.drawLine(109, 132, 109, 198);
     }
 
@@ -54,23 +62,24 @@ class myRunFieldsView extends Ui.DataField {
                 max = hrZ[i];
             }
         }
+        // if no activity yet...
         if (total < 1) {
             return;
         }
 
         var curX = 44;
 
-        // to avoid setting the color
+        // to avoid setting the color write the labels first
         for (var i = 0; i < hrZ.size(); i++) {
-            textC(dc, curX, 63, Graphics.FONT_XTINY, "Z" + i);
+            textC(dc, curX, 78, Graphics.FONT_XTINY, "Z" + i);
             curX += 25;
         }
 
         curX = 33;
         for (var i = 0; i < hrZ.size(); i++) {
-            var pct = hrZ[i] / total;
-            var h = (pct * 38 + 0.5).toLong();
-            var y = 56 - h;
+            var pct = hrZ[i] / max;
+            var h = (pct * 53 + 0.5).toLong();
+            var y = 71 - h;
             if (h > 0) {
                 dc.setColor(colorsForHr[i], Graphics.COLOR_TRANSPARENT);
                 dc.fillRectangle(curX, y, 20, h);
@@ -86,7 +95,7 @@ class myRunFieldsView extends Ui.DataField {
                 curX += 10;
             }
 
-            textC(dc, 109, 26, Graphics.FONT_XTINY, fields.fmtSecs(max));
+            textC(dc, 109, 30, Graphics.FONT_NUMBER_MILD, fields.fmtSecs(max));
         }
     }
 
@@ -94,9 +103,10 @@ class myRunFieldsView extends Ui.DataField {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_WHITE);
         dc.clear();
 
+        doingTimer = what < 5 || fields.hrN == null;
         drawLayout(dc);
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
-        if (what < 5 || fields.hrN == null) {
+        if (doingTimer) {
             textL(dc, 36, 45, Graphics.FONT_NUMBER_MEDIUM,  fields.time);
             textL(dc, 55, 18, Graphics.FONT_XTINY, "TOD");
             textL(dc, 112, 45, Graphics.FONT_NUMBER_MEDIUM,  fields.timer);
@@ -117,9 +127,11 @@ class myRunFieldsView extends Ui.DataField {
             what = 0;
         }
 
-        doCadenceBackground(dc, fields.cadenceN);
+        if (doingTimer) {
+            doCadenceBackground(dc, fields.cadenceN);
+            textC(dc, 30, 79, Graphics.FONT_XTINY,  "CAD");
+        }
         textC(dc, 30, 107, Graphics.FONT_NUMBER_MEDIUM, fields.cadence);
-        textC(dc, 30, 79, Graphics.FONT_XTINY,  "CAD");
 
         var unit;
         var settings = Sys.getDeviceSettings();
@@ -130,12 +142,15 @@ class myRunFieldsView extends Ui.DataField {
         }
 
         textC(dc, 110, 107, Graphics.FONT_NUMBER_MEDIUM, fields.pace10s);
-        textC(dc, 110, 79, Graphics.FONT_XTINY,  "PACE " + unit);
+        if (doingTimer) {
+            textC(dc, 110, 79, Graphics.FONT_XTINY,  "PACE " + unit);
+        }
 
-        doHrBackground(dc, fields.hrZoneN);
         textC(dc, 180, 107, Graphics.FONT_NUMBER_MEDIUM, fields.hr);
-        textC(dc, 180, 79, Graphics.FONT_XTINY,  "HR");
-
+        if (doingTimer) {
+            doHrBackground(dc, fields.hrZoneN);
+            textC(dc, 180, 79, Graphics.FONT_XTINY,  "HR");
+        }
 
         textC(dc, 66, 154, Graphics.FONT_NUMBER_MEDIUM, fields.dist);
         textL(dc, 54, 186, Graphics.FONT_XTINY, "DIST");
