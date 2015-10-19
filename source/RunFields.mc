@@ -2,8 +2,8 @@ using Toybox.Time as Time;
 using Toybox.System as Sys;
 
 class RunFields {
-    // last 10 seconds - 'current speed' samples
-    hidden var lastSecs = new [10];
+    // last 16 seconds - 'current speed' samples
+    hidden var lastSecs = new [16];
     hidden var curPos;
     hidden var lastElapsedTime;
 
@@ -29,9 +29,9 @@ class RunFields {
         }
         hrZonesDef[0] = 116;
         hrZonesDef[1] = 149;
-        hrZonesDef[2] = 165;
-        hrZonesDef[3] = 177;
-        hrZonesDef[4] = 186;
+        hrZonesDef[2] = 157;
+        hrZonesDef[3] = 170;
+        hrZonesDef[4] = 184;
 
         for (var i = 0; i < hrZones.size(); ++i) {
             hrZones[i] = 0.0;
