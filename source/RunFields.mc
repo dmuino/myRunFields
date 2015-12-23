@@ -22,6 +22,7 @@ class RunFields {
     var pace10s;
     var paceAvg;
     var time;
+    var gpsSignalStrength;
 
     function initialize() {
         for (var i = 0; i < lastSecs.size(); ++i) {
@@ -139,7 +140,7 @@ class RunFields {
     function compute(info) {
         var elapsed = info.elapsedTime;
         var inActivity = elapsed != null && elapsed > 0;
-
+		gpsSignalStrength = info.currentLocationAccuracy;
         if (info.currentSpeed != null && info.currentSpeed > 0) {
             var idx = curPos % lastSecs.size();
             curPos++;

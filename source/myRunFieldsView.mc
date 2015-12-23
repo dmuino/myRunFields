@@ -9,6 +9,7 @@ class myRunFieldsView extends Ui.DataField {
     hidden var doingTimer = true;
 
     var colorsForHr = new [6];
+    var colorsForGps = new [5];
 
     function initialize(fieldsArg) {
         fields = fieldsArg;
@@ -19,6 +20,12 @@ class myRunFieldsView extends Ui.DataField {
         colorsForHr[3] = Graphics.COLOR_YELLOW;
         colorsForHr[4] = Graphics.COLOR_ORANGE;
         colorsForHr[5] = Graphics.COLOR_RED;
+
+        colorsForGps[0] = Graphics.COLOR_BLACK;
+        colorsForGps[1] = Graphics.COLOR_RED;
+        colorsForGps[2] = Graphics.COLOR_ORANGE;
+        colorsForGps[3] = Graphics.COLOR_YELLOW;
+        colorsForGps[4] = Graphics.COLOR_GREEN;
     }
 
     function onLayout(dc) {
@@ -43,7 +50,8 @@ class myRunFieldsView extends Ui.DataField {
         }
         dc.drawLine(0, y, 218, y);
         if (doingTimer) {
-            dc.drawLine(109, 0, 109, y);
+            dc.drawLine(109, 16, 109, y);
+            dc.drawLine(0, 12, 218, 12);
         } else {
         }
         dc.drawLine(65, y, 65, 132);
@@ -153,12 +161,13 @@ class myRunFieldsView extends Ui.DataField {
         }
 
         textC(dc, 66, 154, Graphics.FONT_NUMBER_MEDIUM, fields.dist);
-        textL(dc, 54, 186, Graphics.FONT_XTINY, "DIST");
+        textC(dc, 66, 186, Graphics.FONT_XTINY, unit);
 
         textC(dc, 150, 154, Graphics.FONT_NUMBER_MEDIUM, fields.paceAvg);
         textL(dc, 124, 186, Graphics.FONT_XTINY, "AVG " + unit);
 
         drawBattery(dc);
+        drawGpsSignalStrength(dc);
 
         return true;
     }
@@ -197,25 +206,50 @@ class myRunFieldsView extends Ui.DataField {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
     }
 
+    function drawGpsSignalStrength(dc) {
+        var i = fields.gpsSignalStrength;
+        if (i == null) {
+            return;
+        }
+
+        if (i > 4) {
+            i = 4;
+        } else if (i < 0) {
+            i = 0;
+        }
+
+        var textColor = i < 3 ? Graphics.COLOR_WHITE : Graphics.COLOR_BLACK;
+        var color = colorsForGps[i];
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.fillRectangle(0, 0, 218, 12);
+        dc.setColor(textColor, Graphics.COLOR_TRANSPARENT);
+        textC(dc, 109, 4, Graphics.FONT_XTINY, "" + i);
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+    }
+
     function drawBattery(dc) {
         var pct = Sys.getSystemStats().battery;
-        dc.drawRectangle(110, 202, 28, 11);
-        dc.fillRectangle(138, 205, 2, 5);
 
-        var pctS = pct.format("%.0f") + "%";
-        textL(dc, 75, 206, Graphics.FONT_TINY, pctS);
         var color = Graphics.COLOR_GREEN;
-        if (pct < 25) {
+        if (pct < 16) {
             color = Graphics.COLOR_RED;
-        } else if (pct < 40) {
+        } else if (pct < 36) {
             color = Graphics.COLOR_YELLOW;
         }
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
 
-        var width = (pct * 26.0 / 100 + 0.5).toLong();
-        if (width > 0) {
-            dc.fillRectangle(111, 203, width, 9);
+        // total width = 98
+        var n = (pct * (96.0 / 4) / 100 + 0.5).toLong();
+        var x = 61;
+
+        for (var i = 0; i < n; ++i) {
+            dc.fillRectangle(x, 200, 3, 13);
+            x += 4;
         }
+
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+        var pctS = pct.format("%.0f") + "%";
+        textC(dc, 109, 206, Graphics.FONT_TINY, pctS);
     }
 
     function compute(info) {
