@@ -28,11 +28,11 @@ class RunFields {
         for (var i = 0; i < lastSecs.size(); ++i) {
             lastSecs[i] = 0.0;
         }
-        hrZonesDef[0] = 116;
-        hrZonesDef[1] = 149;
-        hrZonesDef[2] = 157;
+        hrZonesDef[0] = 119;
+        hrZonesDef[1] = 145;
+        hrZonesDef[2] = 160;
         hrZonesDef[3] = 170;
-        hrZonesDef[4] = 184;
+        hrZonesDef[4] = 180;
 
         for (var i = 0; i < hrZones.size(); ++i) {
             hrZones[i] = 0.0;

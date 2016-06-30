@@ -42,17 +42,11 @@ class myRunFieldsView extends Ui.DataField {
         dc.drawLine(0, 132, 218, 132);
         dc.drawLine(0, 198, 218, 198);
         // vertical lines
-        var y;
-        if (doingTimer) {
-            y = 71;
-        } else {
-            y = 86;
-        }
+        var y = 71;
         dc.drawLine(0, y, 218, y);
         if (doingTimer) {
             dc.drawLine(109, 16, 109, y);
             dc.drawLine(0, 12, 218, 12);
-        } else {
         }
         dc.drawLine(65, y, 65, 132);
         dc.drawLine(153, y, 153, 132);
@@ -70,20 +64,14 @@ class myRunFieldsView extends Ui.DataField {
                 max = hrZ[i];
             }
         }
+
         // if no activity yet...
         if (total < 1) {
             return;
         }
 
-        var curX = 44;
+        var curX = 33;
 
-        // to avoid setting the color write the labels first
-        for (var i = 0; i < hrZ.size(); i++) {
-            textC(dc, curX, 78, Graphics.FONT_XTINY, "Z" + i);
-            curX += 25;
-        }
-
-        curX = 33;
         for (var i = 0; i < hrZ.size(); i++) {
             var pct = hrZ[i] / max;
             var h = (pct * 53 + 0.5).toLong();
@@ -111,7 +99,7 @@ class myRunFieldsView extends Ui.DataField {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_WHITE);
         dc.clear();
 
-        doingTimer = what < 5 || fields.hrN == null;
+        doingTimer = what < 7 || fields.hrN == null;
         drawLayout(dc);
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
         if (doingTimer) {
@@ -135,10 +123,8 @@ class myRunFieldsView extends Ui.DataField {
             what = 0;
         }
 
-        if (doingTimer) {
-            doCadenceBackground(dc, fields.cadenceN);
-            textC(dc, 30, 79, Graphics.FONT_XTINY,  "CAD");
-        }
+		doCadenceBackground(dc, fields.cadenceN);
+		textC(dc, 30, 79, Graphics.FONT_XTINY,  "CAD");
         textC(dc, 30, 107, Graphics.FONT_NUMBER_MEDIUM, fields.cadence);
 
         var unit;
@@ -150,15 +136,11 @@ class myRunFieldsView extends Ui.DataField {
         }
 
         textC(dc, 110, 107, Graphics.FONT_NUMBER_MEDIUM, fields.pace10s);
-        if (doingTimer) {
-            textC(dc, 110, 79, Graphics.FONT_XTINY,  "PACE " + unit);
-        }
+		textC(dc, 110, 79, Graphics.FONT_XTINY,  "PACE " + unit);
 
         textC(dc, 180, 107, Graphics.FONT_NUMBER_MEDIUM, fields.hr);
-        if (doingTimer) {
-            doHrBackground(dc, fields.hrZoneN);
-            textC(dc, 180, 79, Graphics.FONT_XTINY,  "HR");
-        }
+		doHrBackground(dc, fields.hrZoneN);
+		textC(dc, 180, 79, Graphics.FONT_XTINY,  "HR");
 
         textC(dc, 66, 154, Graphics.FONT_NUMBER_MEDIUM, fields.dist);
         textC(dc, 66, 186, Graphics.FONT_XTINY, unit);
