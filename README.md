@@ -4,8 +4,8 @@ Connect IQ DataField for the Fenix3 watch for runners
 
 ## Screenshot
 
-![Screenshot 1](https://raw.github.com/dmuino/HMFields/master/screenshots/ss1.png)
-![Screenshot 2](https://raw.github.com/dmuino/HMFields/master/screenshots/ss2.png)
+![Screenshot 1](https://raw.github.com/dmuino/myRunFields/master/screenshots/ss1.png)
+![Screenshot 2](https://raw.github.com/dmuino/myRunFields/master/screenshots/ss2.png)
 
 ## Fields
 
